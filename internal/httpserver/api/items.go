@@ -82,11 +82,32 @@ func EndpointItemsByUuidImagesPrimary(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "image/jpeg")
 		jpeg.Encode(w, retImage, jpegOptions)
+
 	case "library.jpg":
 		imageCachePath := filepath.Join(librarymgmt.CacheDir, "images")
 		libNameCardPath := filepath.Join(imageCachePath, item.RootUuid+".png")
 
 		image, err := imaging.Open(libNameCardPath)
+		if err != nil {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+
+		retImage := imaging.Resize(image, width, height, imaging.Lanczos)
+
+		os.MkdirAll(imageCachePath, 0755)
+		out, err := os.Create(imageFileCachePath)
+		if err == nil {
+			defer out.Close()
+			jpeg.Encode(out, retImage, jpegOptions)
+		}
+
+		w.Header().Set("Content-Type", "image/jpeg")
+		jpeg.Encode(w, retImage, jpegOptions)
+
+	case "poster.jpg":
+		imagePath := filepath.Join(librarymgmt.MetadataDir, item.ImdbId, "poster.jpg")
+		image, err := imaging.Open(imagePath)
 		if err != nil {
 			http.Error(w, "not found", http.StatusNotFound)
 			return

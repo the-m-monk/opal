@@ -253,11 +253,15 @@ func fetchMetadataMovie(findRes *tmdbFindResponse, imdbId string, item *TreeNode
 		return
 	}
 
-	item.MovieMetadata = movieInfo
+	posterPath, posterPrimaryAspectRatio := tmdbGetBestImage(movieInfo.Images.Posters)
+	logoPath, logoPrimaryAspectRatio := tmdbGetBestImage(movieInfo.Images.Logos)
+	backdropPath, backdropPrimaryAspectRatio := tmdbGetBestImage(movieInfo.Images.Backdrops)
 
-	posterPath := tmdbGetBestImage(movieInfo.Images.Posters)
-	logoPath := tmdbGetBestImage(movieInfo.Images.Logos)
-	backdropPath := tmdbGetBestImage(movieInfo.Images.Backdrops)
+	movieInfo.PosterPrimaryAspectRatio = posterPrimaryAspectRatio
+	movieInfo.LogoPrimaryAspectRatio = logoPrimaryAspectRatio
+	movieInfo.BackdropPrimaryAspectRatio = backdropPrimaryAspectRatio
+
+	item.MovieMetadata = movieInfo
 
 	MetadataDirPath := path.Join(MetadataDir, imdbId)
 	posterImagePath := path.Join(MetadataDirPath, "poster.jpg")
@@ -318,11 +322,15 @@ func fetchMetadataTvshow(findRes *tmdbFindResponse, imdbId string, item *TreeNod
 		return
 	}
 
-	item.TvshowMetadata = tvshowInfo
+	posterPath, posterPrimaryAspectRatio := tmdbGetBestImage(tvshowInfo.Images.Posters)
+	logoPath, logoPrimaryAspectRatio := tmdbGetBestImage(tvshowInfo.Images.Logos)
+	backdropPath, backdropPrimaryAspectRatio := tmdbGetBestImage(tvshowInfo.Images.Backdrops)
 
-	posterPath := tmdbGetBestImage(tvshowInfo.Images.Posters)
-	logoPath := tmdbGetBestImage(tvshowInfo.Images.Logos)
-	backdropPath := tmdbGetBestImage(tvshowInfo.Images.Backdrops)
+	tvshowInfo.PosterPrimaryAspectRatio = posterPrimaryAspectRatio
+	tvshowInfo.LogoPrimaryAspectRatio = logoPrimaryAspectRatio
+	tvshowInfo.BackdropPrimaryAspectRatio = backdropPrimaryAspectRatio
+
+	item.TvshowMetadata = tvshowInfo
 
 	MetadataDirPath := path.Join(MetadataDir, imdbId)
 	posterImagePath := path.Join(MetadataDirPath, "poster.jpg")

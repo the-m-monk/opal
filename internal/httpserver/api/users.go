@@ -714,11 +714,15 @@ func EndpointUsersItems(w http.ResponseWriter, r *http.Request) {
 		case "tvshow":
 			cItem.Type = "Series"
 			cItem.IsFolder = true
-			//cItem.Name = child.Metadata.Title
+			cItem.Name = child.TvshowMetadata.Name
+			cItem.ImageTags.Primary = "poster.jpg"
+			cItem.PrimaryImageAspectRatio = child.TvshowMetadata.PosterPrimaryAspectRatio
 		case "movie":
 			cItem.Type = "Movie"
 			cItem.IsFolder = false
-			//cItem.Name = child.MovieMetadata.Title
+			cItem.Name = child.MovieMetadata.Title
+			cItem.ImageTags.Primary = "poster.jpg"
+			cItem.PrimaryImageAspectRatio = child.MovieMetadata.PosterPrimaryAspectRatio
 		}
 
 		resItems = append(resItems, cItem)

@@ -157,6 +157,10 @@ type tmdbMovie struct {
 		Logos     []tmdbImage `json:"logos"`
 		Posters   []tmdbImage `json:"posters"`
 	} `json:"images"`
+
+	PosterPrimaryAspectRatio   float64 `json:"PosterPrimaryAspectRatio"`
+	LogoPrimaryAspectRatio     float64 `json:"LogoPrimaryAspectRatio"`
+	BackdropPrimaryAspectRatio float64 `json:"BackdropPrimaryAspectRatio"`
 }
 
 func tmdbFetchMovie(tmdbId int) *tmdbMovie {
@@ -283,6 +287,10 @@ type tmdbTvshow struct {
 		Logos     []tmdbImage `json:"logos"`
 		Posters   []tmdbImage `json:"posters"`
 	} `json:"images"`
+
+	PosterPrimaryAspectRatio   float64 `json:"PosterPrimaryAspectRatio"`
+	LogoPrimaryAspectRatio     float64 `json:"LogoPrimaryAspectRatio"`
+	BackdropPrimaryAspectRatio float64 `json:"BackdropPrimaryAspectRatio"`
 }
 
 func tmdbFetchTvshow(tmdbId int) *tmdbTvshow {
@@ -328,10 +336,10 @@ func tmdbFetchTvshow(tmdbId int) *tmdbTvshow {
 	return nil
 }
 
-func tmdbGetBestImage(images []tmdbImage) string {
+func tmdbGetBestImage(images []tmdbImage) (url string, aspectRatio float64) {
 	//TODO: this logic can lead to some mediocre image selections, optimise in the future
 	if len(images) == 0 {
-		return ""
+		return "", 0
 	}
 
 	var filtered []tmdbImage
@@ -344,7 +352,7 @@ func tmdbGetBestImage(images []tmdbImage) string {
 	}
 
 	if len(filtered) == 0 {
-		return ""
+		return "", 0
 	}
 
 	sort.Slice(filtered, func(i, j int) bool {
@@ -370,7 +378,7 @@ func tmdbGetBestImage(images []tmdbImage) string {
 		return filtered[i].VoteCount > filtered[j].VoteCount
 	})
 
-	return filtered[0].FilePath
+	return filtered[0].FilePath, filtered[0].AspectRatio
 }
 
 func tmdbFetchImage(tmdbPath string, filePath string) error {
