@@ -283,7 +283,7 @@ func EndpointUsersItemsLatest(w http.ResponseWriter, r *http.Request) {
 				LocationType: "FileSystem",
 				VideoType:    "VideoFile",
 			}
-			mediaItem.ImageTags.Primary = "backdrop.jpg"
+			mediaItem.ImageTags.Primary = "backdrop.png"
 
 		case "tvshow":
 			mediaItem = jfstructs.CommonItem{
@@ -295,7 +295,7 @@ func EndpointUsersItemsLatest(w http.ResponseWriter, r *http.Request) {
 				LocationType: "FileSystem",
 				VideoType:    "VideoFile",
 			}
-			mediaItem.ImageTags.Primary = "backdrop.jpg"
+			mediaItem.ImageTags.Primary = "backdrop.png"
 		}
 
 		res = append(res, mediaItem)
@@ -465,12 +465,12 @@ func EndpointUsersItemsByUuidMovie(w http.ResponseWriter, r *http.Request, itemU
 	durationTicks := durationF64 * 10_000_000 //The official jellyfin server is written in C#/.Net framework, a tick in .Net is a ten millionth of a second
 
 	res := jfstructs.ResponseUsersItemsByUuidMovie{
-		//Name:          item.MovieMetadata.Title,
-		//OriginalTitle: item.MovieMetadata.OriginalTitle,
-		ServerID: "STUBBED",
-		ID:       item.Uuid,
-		//Overview:      item.MovieMetadata.Overview,
-		Path: fmt.Sprintf("/Libraries/%s%s", item.RootUuid, item.Path),
+		Name:          item.MovieMetadata.Title,
+		OriginalTitle: item.MovieMetadata.OriginalTitle,
+		ServerID:      "STUBBED",
+		ID:            item.Uuid,
+		Overview:      item.MovieMetadata.Overview,
+		Path:          fmt.Sprintf("/Libraries/%s%s", item.RootUuid, item.Path),
 		//PremiereDate:  item.MovieMetadata.ReleasedTime,
 		RunTimeTicks: int64(durationTicks),
 		PlayAccess:   "Full",
@@ -479,6 +479,13 @@ func EndpointUsersItemsByUuidMovie(w http.ResponseWriter, r *http.Request, itemU
 		VideoType:    "VideoFile",
 		CanDownload:  true,
 	}
+	res.ImageTags.Primary = "poster.png"
+	res.ImageTags.Logo = "logo.png"
+	res.ImageTags.Thumb = "backdrop.png"
+
+	res.BackdropImageTags = []string{"backdrop.png"}
+
+	res.PrimaryImageAspectRatio = item.MovieMetadata.PosterPrimaryAspectRatio
 
 	//TODO: this maybe incorrect behaviour, jellyfin potentially just returns the file extension
 	switch movieProbe.Format.FormatName {
@@ -711,13 +718,13 @@ func EndpointUsersItems(w http.ResponseWriter, r *http.Request) {
 			cItem.Type = "Series"
 			cItem.IsFolder = true
 			cItem.Name = child.TvshowMetadata.Name
-			cItem.ImageTags.Primary = "poster.jpg"
+			cItem.ImageTags.Primary = "poster.png"
 			cItem.PrimaryImageAspectRatio = child.TvshowMetadata.PosterPrimaryAspectRatio
 		case "movie":
 			cItem.Type = "Movie"
 			cItem.IsFolder = false
 			cItem.Name = child.MovieMetadata.Title
-			cItem.ImageTags.Primary = "poster.jpg"
+			cItem.ImageTags.Primary = "poster.png"
 			cItem.PrimaryImageAspectRatio = child.MovieMetadata.PosterPrimaryAspectRatio
 		}
 

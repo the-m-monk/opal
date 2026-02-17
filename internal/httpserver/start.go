@@ -48,6 +48,9 @@ func Start() {
 	http.HandleFunc("/DisplayPreferences/usersettings", api.EndpointDisplayPreferencesUsersettings)
 
 	http.HandleFunc("/Items/{uuid}/Images/Primary", api.EndpointItemsByUuidImagesPrimary)
+	http.HandleFunc("/Items/{uuid}/Images/Logo", api.EndpointItemsUuidImagesLogo)
+	http.HandleFunc("/Items/{uuid}", api.EndpointItemsUuid)
+	http.HandleFunc("/Items/{uuid}/Images/Backdrop/0", api.EndpointItemsUuidImagesBackdrop)
 
 	http.HandleFunc("/Shows/NextUp", api.EndpointShowsNextUp)
 

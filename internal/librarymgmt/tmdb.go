@@ -3,11 +3,13 @@ package librarymgmt
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	"image/png"
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 	"time"
 )
 
@@ -336,6 +338,7 @@ func tmdbFetchTvshow(tmdbId int) *tmdbTvshow {
 	return nil
 }
 
+/*
 func tmdbGetBestImage(images []tmdbImage) (url string, aspectRatio float64) {
 	//TODO: this logic can lead to some mediocre image selections, optimise in the future
 	if len(images) == 0 {
@@ -379,6 +382,51 @@ func tmdbGetBestImage(images []tmdbImage) (url string, aspectRatio float64) {
 	})
 
 	return filtered[0].FilePath, filtered[0].AspectRatio
+}*/
+
+func tmdbGetBestImage(images []tmdbImage) (url string, aspectRatio float64) {
+	//TODO: this logic can lead to some mediocre image selections, optimise in the future
+	if len(images) == 0 {
+		return "", 0
+	}
+
+	var filtered []tmdbImage
+	for _, img := range images {
+		//TODO: add supported for other language preferences
+		lang := img.Iso6391
+		if lang == "en" || lang == "" {
+			filtered = append(filtered, img)
+		}
+	}
+
+	if len(filtered) == 0 {
+		return "", 0
+	}
+	/*
+		sort.Slice(filtered, func(i, j int) bool {
+			langI := filtered[i].Iso6391
+			langJ := filtered[j].Iso6391
+
+			if langI != langJ {
+				if langI == "en" {
+					return true
+				}
+				if langJ == "en" {
+					return false
+				}
+			}
+
+			scoreI := filtered[i].VoteAverage * float64(filtered[i].VoteCount)
+			scoreJ := filtered[j].VoteAverage * float64(filtered[j].VoteCount)
+
+			if scoreI != scoreJ {
+				return scoreI > scoreJ
+			}
+
+			return filtered[i].VoteCount > filtered[j].VoteCount
+		})
+	*/
+	return filtered[0].FilePath, filtered[0].AspectRatio
 }
 
 func tmdbFetchImage(tmdbPath string, filePath string) error {
@@ -388,12 +436,6 @@ func tmdbFetchImage(tmdbPath string, filePath string) error {
 	if err != nil {
 		return fmt.Errorf("could not create directory: %w", err)
 	}
-
-	out, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("could not create file: %w", err)
-	}
-	defer out.Close()
 
 	resp, err := http.Get(apiPath)
 	if err != nil {
@@ -405,9 +447,21 @@ func tmdbFetchImage(tmdbPath string, filePath string) error {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	_, err = io.Copy(out, resp.Body)
+	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return fmt.Errorf("failed to save image: %w", err)
+		return fmt.Errorf("failed to decode image: %w", err)
+	}
+
+	out, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("could not create file: %w", err)
+	}
+	defer out.Close()
+
+	encoder := png.Encoder{CompressionLevel: png.DefaultCompression}
+	err = encoder.Encode(out, img)
+	if err != nil {
+		return fmt.Errorf("failed to encode png: %w", err)
 	}
 
 	return nil

@@ -622,6 +622,14 @@ type ResponseUsersItemsByUuidMovie struct {
 	MediaSources  []ResponseUsersItemsByUuidMovieMediaSources       `json:"MediaSources"`
 	VideoType     string                                            `json:"VideoType"`
 	CanDownload   bool                                              `json:"CanDownload"`
+
+	ImageTags struct {
+		Logo    string `json:"Logo"`
+		Thumb   string `json:"Thumb"`
+		Primary string `json:"Primary"`
+	} `json:"ImageTags"`
+	PrimaryImageAspectRatio float64  `json:"PrimaryImageAspectRatio"`
+	BackdropImageTags       []string `json:"BackdropImageTags"`
 	//Etag          string    `json:"Etag"`
 	//DateCreated  time.Time `json:"DateCreated"`
 	//CanDelete    bool      `json:"CanDelete"`
@@ -727,7 +735,7 @@ type ResponseUsersItemsByUuidMovie struct {
 		SpecialFeatureCount     int      `json:"SpecialFeatureCount"`
 		DisplayPreferencesID    string   `json:"DisplayPreferencesId"`
 		Tags                    []string `json:"Tags"`
-		PrimaryImageAspectRatio float64  `json:"PrimaryImageAspectRatio"`
+
 		MediaStreams            []struct {
 			Codec                    string  `json:"Codec"`
 			TimeBase                 string  `json:"TimeBase"`
@@ -770,11 +778,7 @@ type ResponseUsersItemsByUuidMovie struct {
 			ColorSpace               string  `json:"ColorSpace,omitempty"`
 		} `json:"MediaStreams"`
 
-		ImageTags struct {
-			Logo    string `json:"Logo"`
-			Thumb   string `json:"Thumb"`
-			Primary string `json:"Primary"`
-		} `json:"ImageTags"`
+
 		BackdropImageTags []string `json:"BackdropImageTags"`
 		ImageBlurHashes   struct {
 			Backdrop struct {

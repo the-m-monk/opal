@@ -18,5 +18,8 @@ clean and merge jfstructs duplicates
 capture json for movie and tvshow
 
 fix metadata image fetcher to pick the same images as jellyfin
+metadata image fetcher has had its sorting logic gutted, picks okay images
 
 properly cache library namecards instead of always rerendering on server statrtup
+
+fetching metadata takes a while with png encoder

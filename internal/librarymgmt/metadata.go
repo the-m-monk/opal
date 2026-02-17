@@ -264,9 +264,9 @@ func fetchMetadataMovie(findRes *tmdbFindResponse, imdbId string, item *TreeNode
 	item.MovieMetadata = movieInfo
 
 	MetadataDirPath := path.Join(MetadataDir, imdbId)
-	posterImagePath := path.Join(MetadataDirPath, "poster.jpg")
-	logoImagePath := path.Join(MetadataDirPath, "logo.jpg")
-	backdropImagePath := path.Join(MetadataDirPath, "backdrop.jpg")
+	posterImagePath := path.Join(MetadataDirPath, "poster.png")
+	logoImagePath := path.Join(MetadataDirPath, "logo.png")
+	backdropImagePath := path.Join(MetadataDirPath, "backdrop.png")
 
 	err := tmdbFetchImage(posterPath, posterImagePath)
 	if err != nil {
@@ -333,9 +333,9 @@ func fetchMetadataTvshow(findRes *tmdbFindResponse, imdbId string, item *TreeNod
 	item.TvshowMetadata = tvshowInfo
 
 	MetadataDirPath := path.Join(MetadataDir, imdbId)
-	posterImagePath := path.Join(MetadataDirPath, "poster.jpg")
-	logoImagePath := path.Join(MetadataDirPath, "logo.jpg")
-	backdropImagePath := path.Join(MetadataDirPath, "backdrop.jpg")
+	posterImagePath := path.Join(MetadataDirPath, "poster.png")
+	logoImagePath := path.Join(MetadataDirPath, "logo.png")
+	backdropImagePath := path.Join(MetadataDirPath, "backdrop.png")
 
 	err := tmdbFetchImage(posterPath, posterImagePath)
 	if err != nil {

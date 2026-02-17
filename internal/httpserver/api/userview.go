@@ -80,7 +80,7 @@ func EndpointUserViews(w http.ResponseWriter, r *http.Request) {
 			MediaType:    "Unknown",
 		}
 
-		newItem.ImageTags.Primary = "library.jpg"
+		newItem.ImageTags.Primary = "library.png"
 		res.Items = append(res.Items, newItem)
 	}
 
