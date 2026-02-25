@@ -465,19 +465,23 @@ func EndpointUsersItemsByUuidMovie(w http.ResponseWriter, r *http.Request, itemU
 	durationTicks := durationF64 * 10_000_000 //The official jellyfin server is written in C#/.Net framework, a tick in .Net is a ten millionth of a second
 
 	res := jfstructs.ResponseUsersItemsByUuidMovie{
-		Name:          item.MovieMetadata.Title,
-		OriginalTitle: item.MovieMetadata.OriginalTitle,
-		ServerID:      "STUBBED",
-		ID:            item.Uuid,
-		Overview:      item.MovieMetadata.Overview,
-		Path:          fmt.Sprintf("/Libraries/%s%s", item.RootUuid, item.Path),
-		//PremiereDate:  item.MovieMetadata.ReleasedTime,
-		RunTimeTicks: int64(durationTicks),
-		PlayAccess:   "Full",
-		MediaType:    "Video",
-		LocationType: "FileSystem",
-		VideoType:    "VideoFile",
-		CanDownload:  true,
+		Name:            item.MovieMetadata.Title,
+		OriginalTitle:   item.MovieMetadata.OriginalTitle,
+		ServerID:        "STUBBED",
+		ID:              item.Uuid,
+		Overview:        item.MovieMetadata.Overview,
+		Path:            fmt.Sprintf("/Libraries/%s%s", item.RootUuid, item.Path),
+		Taglines:        []string{item.MovieMetadata.Tagline},
+		RunTimeTicks:    int64(durationTicks),
+		PlayAccess:      "Full",
+		MediaType:       "Video",
+		LocationType:    "FileSystem",
+		VideoType:       "VideoFile",
+		CanDownload:     true,
+		CanDelete:       false,
+		PremiereDate:    item.ReleasedTime,
+		OfficialRating:  item.Rating,
+		CommunityRating: item.MovieMetadata.VoteAverage,
 	}
 	res.ImageTags.Primary = "poster.png"
 	res.ImageTags.Logo = "logo.png"
@@ -487,7 +491,20 @@ func EndpointUsersItemsByUuidMovie(w http.ResponseWriter, r *http.Request, itemU
 
 	res.PrimaryImageAspectRatio = item.MovieMetadata.PosterPrimaryAspectRatio
 
+	imdbUrl := jfstructs.ResponseUsersItemsByUuidMovieExternalUrls{
+		Name: "IMDB",
+		URL:  fmt.Sprintf("https://www.imdb.com/title/%s", item.ImdbId),
+	}
+	res.ExternalUrls = append(res.ExternalUrls, imdbUrl)
+
+	tmdbUrl := jfstructs.ResponseUsersItemsByUuidMovieExternalUrls{
+		Name: "TMDB",
+		URL:  fmt.Sprintf("https://www.themoviedb.org/movie/%d", item.MovieMetadata.ID),
+	}
+	res.ExternalUrls = append(res.ExternalUrls, tmdbUrl)
+
 	//TODO: this maybe incorrect behaviour, jellyfin potentially just returns the file extension
+	//NOTE: jellyfin's official demo server often returns "mov,mp4,m4a,3gp,3g2,mj2" but most selfhosted servers return "mp4"
 	switch movieProbe.Format.FormatName {
 	case "matroska,webm":
 		res.Container = "mkv"
@@ -514,7 +531,7 @@ func EndpointUsersItemsByUuidMovie(w http.ResponseWriter, r *http.Request, itemU
 		ID:                   item.Uuid,
 		Path:                 res.Path,
 		SupportsTranscoding:  true,
-		SupportsDirectStream: true,
+		SupportsDirectStream: false, //I dont think any modern jellyfin clients support/use direct stream, they either direct play or just use hls
 		SupportsDirectPlay:   true,
 		Type:                 "Default",
 		Container:            res.Container,
@@ -528,8 +545,8 @@ func EndpointUsersItemsByUuidMovie(w http.ResponseWriter, r *http.Request, itemU
 	json.NewEncoder(w).Encode(res)
 }
 
-func buildMediaStreamVideo(ffprobeStream mediamgmt.Stream) jfstructs.ResponseUsersItemsByUuidMovieMediaStreamsStream {
-	var jfStream jfstructs.ResponseUsersItemsByUuidMovieMediaStreamsStream
+func buildMediaStreamVideo(ffprobeStream mediamgmt.Stream) jfstructs.CommonStream {
+	var jfStream jfstructs.CommonStream
 
 	//TODO: make CodecName to human-readable string map
 
@@ -555,8 +572,8 @@ func buildMediaStreamVideo(ffprobeStream mediamgmt.Stream) jfstructs.ResponseUse
 	return jfStream
 }
 
-func buildMediaStreamAudio(ffprobeStream mediamgmt.Stream) jfstructs.ResponseUsersItemsByUuidMovieMediaStreamsStream {
-	var jfStream jfstructs.ResponseUsersItemsByUuidMovieMediaStreamsStream
+func buildMediaStreamAudio(ffprobeStream mediamgmt.Stream) jfstructs.CommonStream {
+	var jfStream jfstructs.CommonStream
 
 	jfStream.Index = ffprobeStream.Index
 	jfStream.Codec = ffprobeStream.CodecName
@@ -581,8 +598,8 @@ func buildMediaStreamAudio(ffprobeStream mediamgmt.Stream) jfstructs.ResponseUse
 	return jfStream
 }
 
-func buildMediaStreamSubtitle(ffprobeStream mediamgmt.Stream) jfstructs.ResponseUsersItemsByUuidMovieMediaStreamsStream {
-	var jfStream jfstructs.ResponseUsersItemsByUuidMovieMediaStreamsStream
+func buildMediaStreamSubtitle(ffprobeStream mediamgmt.Stream) jfstructs.CommonStream {
+	var jfStream jfstructs.CommonStream
 
 	jfStream.Index = ffprobeStream.Index
 	jfStream.Codec = ffprobeStream.CodecName

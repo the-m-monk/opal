@@ -27,6 +27,7 @@ type TreeNode struct {
 	ImdbId       string
 	Mtime        time.Time
 	ReleasedTime time.Time
+	Rating       string
 }
 
 // TODO: most functions dont respect the mutex but atleast they only read

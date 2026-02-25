@@ -34,6 +34,10 @@ address=0.0.0.0
 port=7096
 metadata_dir="./metadata"
 cache_dir="./cache"
+#set this variable to the iso 3166-1 alpha-2 code for your region
+#https://en.wikipedia.org/wiki/ISO_3166-1#Codes
+#Examples: US, GB, AU, CA, NZ, DE, KR, JP, etc.
+rating_system="US"
 ```
 
 /config/theme.css:

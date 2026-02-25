@@ -101,73 +101,9 @@ func tmdbFind(imdbId string) *tmdbFindResponse {
 	return nil
 }
 
-type tmdbImage struct {
-	AspectRatio float64 `json:"aspect_ratio"`
-	Height      int     `json:"height"`
-	Iso31661    string  `json:"iso_3166_1"`
-	Iso6391     string  `json:"iso_639_1"`
-	FilePath    string  `json:"file_path"`
-	VoteAverage float64 `json:"vote_average"`
-	VoteCount   int     `json:"vote_count"`
-	Width       int     `json:"width"`
-}
-
-type tmdbMovie struct {
-	Adult               bool        `json:"adult"`
-	BackdropPath        string      `json:"backdrop_path"`
-	BelongsToCollection interface{} `json:"belongs_to_collection"`
-	Budget              int         `json:"budget"`
-	Genres              []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"genres"`
-	Homepage            string   `json:"homepage"`
-	ID                  int      `json:"id"`
-	ImdbID              string   `json:"imdb_id"`
-	OriginCountry       []string `json:"origin_country"`
-	OriginalLanguage    string   `json:"original_language"`
-	OriginalTitle       string   `json:"original_title"`
-	Overview            string   `json:"overview"`
-	Popularity          float64  `json:"popularity"`
-	PosterPath          string   `json:"poster_path"`
-	ProductionCompanies []struct {
-		ID            int    `json:"id"`
-		LogoPath      string `json:"logo_path"`
-		Name          string `json:"name"`
-		OriginCountry string `json:"origin_country"`
-	} `json:"production_companies"`
-	ProductionCountries []struct {
-		Iso31661 string `json:"iso_3166_1"`
-		Name     string `json:"name"`
-	} `json:"production_countries"`
-	ReleaseDate     string `json:"release_date"`
-	Revenue         int    `json:"revenue"`
-	Runtime         int    `json:"runtime"`
-	SpokenLanguages []struct {
-		EnglishName string `json:"english_name"`
-		Iso6391     string `json:"iso_639_1"`
-		Name        string `json:"name"`
-	} `json:"spoken_languages"`
-	Status      string  `json:"status"`
-	Tagline     string  `json:"tagline"`
-	Title       string  `json:"title"`
-	Video       bool    `json:"video"`
-	VoteAverage float64 `json:"vote_average"`
-	VoteCount   int     `json:"vote_count"`
-	Images      struct {
-		Backdrops []tmdbImage `json:"backdrops"`
-		Logos     []tmdbImage `json:"logos"`
-		Posters   []tmdbImage `json:"posters"`
-	} `json:"images"`
-
-	PosterPrimaryAspectRatio   float64 `json:"PosterPrimaryAspectRatio"`
-	LogoPrimaryAspectRatio     float64 `json:"LogoPrimaryAspectRatio"`
-	BackdropPrimaryAspectRatio float64 `json:"BackdropPrimaryAspectRatio"`
-}
-
 func tmdbFetchMovie(tmdbId int) *tmdbMovie {
 	client := &http.Client{Timeout: 10 * time.Second}
-	apiPath := fmt.Sprintf("https://api.themoviedb.org/3/movie/%d?append_to_response=images", tmdbId)
+	apiPath := fmt.Sprintf("https://api.themoviedb.org/3/movie/%d?append_to_response=credits,images,videos,release_dates,keywords,recommendations,similar,translations,external_ids", tmdbId)
 
 	for attempts := 0; attempts < 3; attempts++ {
 		req, err := http.NewRequest("GET", apiPath, nil)
@@ -208,96 +144,9 @@ func tmdbFetchMovie(tmdbId int) *tmdbMovie {
 	return nil
 }
 
-type tmdbTvshow struct {
-	Adult          bool          `json:"adult"`
-	BackdropPath   string        `json:"backdrop_path"`
-	CreatedBy      []interface{} `json:"created_by"`
-	EpisodeRunTime []int         `json:"episode_run_time"`
-	FirstAirDate   string        `json:"first_air_date"`
-	Genres         []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"genres"`
-	Homepage         string   `json:"homepage"`
-	ID               int      `json:"id"`
-	InProduction     bool     `json:"in_production"`
-	Languages        []string `json:"languages"`
-	LastAirDate      string   `json:"last_air_date"`
-	LastEpisodeToAir struct {
-		ID             int     `json:"id"`
-		Name           string  `json:"name"`
-		Overview       string  `json:"overview"`
-		VoteAverage    float64 `json:"vote_average"`
-		VoteCount      int     `json:"vote_count"`
-		AirDate        string  `json:"air_date"`
-		EpisodeNumber  int     `json:"episode_number"`
-		EpisodeType    string  `json:"episode_type"`
-		ProductionCode string  `json:"production_code"`
-		Runtime        int     `json:"runtime"`
-		SeasonNumber   int     `json:"season_number"`
-		ShowID         int     `json:"show_id"`
-		StillPath      string  `json:"still_path"`
-	} `json:"last_episode_to_air"`
-	Name             string      `json:"name"`
-	NextEpisodeToAir interface{} `json:"next_episode_to_air"`
-	Networks         []struct {
-		ID            int    `json:"id"`
-		LogoPath      string `json:"logo_path"`
-		Name          string `json:"name"`
-		OriginCountry string `json:"origin_country"`
-	} `json:"networks"`
-	NumberOfEpisodes    int      `json:"number_of_episodes"`
-	NumberOfSeasons     int      `json:"number_of_seasons"`
-	OriginCountry       []string `json:"origin_country"`
-	OriginalLanguage    string   `json:"original_language"`
-	OriginalName        string   `json:"original_name"`
-	Overview            string   `json:"overview"`
-	Popularity          float64  `json:"popularity"`
-	PosterPath          string   `json:"poster_path"`
-	ProductionCompanies []struct {
-		ID            int    `json:"id"`
-		LogoPath      string `json:"logo_path"`
-		Name          string `json:"name"`
-		OriginCountry string `json:"origin_country"`
-	} `json:"production_companies"`
-	ProductionCountries []struct {
-		Iso31661 string `json:"iso_3166_1"`
-		Name     string `json:"name"`
-	} `json:"production_countries"`
-	Seasons []struct {
-		AirDate      string  `json:"air_date"`
-		EpisodeCount int     `json:"episode_count"`
-		ID           int     `json:"id"`
-		Name         string  `json:"name"`
-		Overview     string  `json:"overview"`
-		PosterPath   string  `json:"poster_path"`
-		SeasonNumber int     `json:"season_number"`
-		VoteAverage  float64 `json:"vote_average"`
-	} `json:"seasons"`
-	SpokenLanguages []struct {
-		EnglishName string `json:"english_name"`
-		Iso6391     string `json:"iso_639_1"`
-		Name        string `json:"name"`
-	} `json:"spoken_languages"`
-	Status      string  `json:"status"`
-	Tagline     string  `json:"tagline"`
-	Type        string  `json:"type"`
-	VoteAverage float64 `json:"vote_average"`
-	VoteCount   int     `json:"vote_count"`
-	Images      struct {
-		Backdrops []tmdbImage `json:"backdrops"`
-		Logos     []tmdbImage `json:"logos"`
-		Posters   []tmdbImage `json:"posters"`
-	} `json:"images"`
-
-	PosterPrimaryAspectRatio   float64 `json:"PosterPrimaryAspectRatio"`
-	LogoPrimaryAspectRatio     float64 `json:"LogoPrimaryAspectRatio"`
-	BackdropPrimaryAspectRatio float64 `json:"BackdropPrimaryAspectRatio"`
-}
-
 func tmdbFetchTvshow(tmdbId int) *tmdbTvshow {
 	client := &http.Client{Timeout: 10 * time.Second}
-	apiPath := fmt.Sprintf("https://api.themoviedb.org/3/tv/%d?append_to_response=images", tmdbId)
+	apiPath := fmt.Sprintf("https://api.themoviedb.org/3/tv/%d?append_to_response=credits,images,videos,release_dates,keywords,recommendations,similar,translations,external_ids", tmdbId)
 
 	for attempts := 0; attempts < 3; attempts++ {
 		req, err := http.NewRequest("GET", apiPath, nil)
@@ -337,52 +186,6 @@ func tmdbFetchTvshow(tmdbId int) *tmdbTvshow {
 
 	return nil
 }
-
-/*
-func tmdbGetBestImage(images []tmdbImage) (url string, aspectRatio float64) {
-	//TODO: this logic can lead to some mediocre image selections, optimise in the future
-	if len(images) == 0 {
-		return "", 0
-	}
-
-	var filtered []tmdbImage
-	for _, img := range images {
-		//TODO: add supported for other language preferences
-		lang := img.Iso6391
-		if lang == "en" || lang == "" {
-			filtered = append(filtered, img)
-		}
-	}
-
-	if len(filtered) == 0 {
-		return "", 0
-	}
-
-	sort.Slice(filtered, func(i, j int) bool {
-		langI := filtered[i].Iso6391
-		langJ := filtered[j].Iso6391
-
-		if langI != langJ {
-			if langI == "en" {
-				return true
-			}
-			if langJ == "en" {
-				return false
-			}
-		}
-
-		scoreI := filtered[i].VoteAverage * float64(filtered[i].VoteCount)
-		scoreJ := filtered[j].VoteAverage * float64(filtered[j].VoteCount)
-
-		if scoreI != scoreJ {
-			return scoreI > scoreJ
-		}
-
-		return filtered[i].VoteCount > filtered[j].VoteCount
-	})
-
-	return filtered[0].FilePath, filtered[0].AspectRatio
-}*/
 
 func tmdbGetBestImage(images []tmdbImage) (url string, aspectRatio float64) {
 	//TODO: this logic can lead to some mediocre image selections, optimise in the future

@@ -51,8 +51,12 @@ func Start() {
 	http.HandleFunc("/Items/{uuid}/Images/Logo", api.EndpointItemsUuidImagesLogo)
 	http.HandleFunc("/Items/{uuid}", api.EndpointItemsUuid)
 	http.HandleFunc("/Items/{uuid}/Images/Backdrop/0", api.EndpointItemsUuidImagesBackdrop)
+	http.HandleFunc("/Items/{uuid}/PlaybackInfo", api.EndpointItemsUuidPlaybackInfo)
 
 	http.HandleFunc("/Shows/NextUp", api.EndpointShowsNextUp)
+
+	//http.HandleFunc("/Videos/{uuid}/stream.{ext}", api.EndpointVideosUuidStream)
+	http.HandleFunc("/Videos/{uuid}/{streamType}", api.EndpointVideosUuidStream)
 
 	fmt.Printf("Server starting on http://%s:%s\n", Addr, Port)
 	http.ListenAndServe(Addr+":"+Port, printMux)

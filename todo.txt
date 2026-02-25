@@ -23,4 +23,29 @@ jellyfin might use omdb for some of its images alongside tmdb
 
 properly cache library namecards instead of always rerendering on server statrtup
 
-fetching metadata takes a while with png encoder
+fetching metadata takes a while with png encoder, maybe using jpegs was fine and there was just an issue with the encoder or something
+metadata image cache misses cause significant image serving latency due to decoding/encoding
+
+namecards dont render vertically centered, potentially due to font
+
+cache ffprobe results, jellyfin 22ms vs Opal 44ms
+
+add multilingual support; add config option to set language and use it to switch title, name, plot, tagline, image selection, etc. in librarymgmt.initMetadata
+
+the video track selector displays "(video track width)p" instead of actual resolution
+
+rating selector system fails often
+
+memory usage while direct playing a video exceeds jellyfin's memory usage under the same conditions
+
+dont create a new json encoder for every endpoint, use json marshal
+
+w.Header().Set("Content-Type", "application/json")
+data, err := json.Marshal(res)
+if err != nil {
+    // handle error
+    return
+}
+w.Write(data)
+
+android client works fine when using web player but breaks when using external player or ExoPlayer.

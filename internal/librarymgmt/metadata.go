@@ -19,6 +19,8 @@ import (
 
 var tmdbApiKey string
 var MetadataDir string
+var ratingSystem string
+
 var tvshowMovieDetectionRegex = regexp.MustCompile(`\[(movie|tvshow)-imdb-(tt\d+)\]`)
 
 func initMetadata() {
@@ -33,6 +35,8 @@ func initMetadata() {
 		fmt.Println("Error: failed to mkdir ")
 		os.Exit(1)
 	}
+
+	ratingSystem = config.FetchValue("/server.cfg", "rating_system", true)
 
 	buildLibraryTree()
 
@@ -217,6 +221,14 @@ func fetchMetadata(imdbId string, item *TreeNode) {
 			fmt.Println("Error parsing date:", err)
 			return
 		}
+
+		for _, r := range item.MovieMetadata.ReleaseDates.Results {
+			if r.Iso31661 != ratingSystem {
+				continue
+			}
+			item.Rating = r.ReleaseDates[0].Certification
+		}
+
 		fmt.Printf("Registering: %s\n", item.MovieMetadata.Title)
 	case "tvshow":
 		item.ReleasedTime, err = time.Parse(timeLayout, item.TvshowMetadata.FirstAirDate)
@@ -224,6 +236,14 @@ func fetchMetadata(imdbId string, item *TreeNode) {
 			fmt.Println("Error parsing date:", err)
 			return
 		}
+
+		//for _, r := range item.TvshowMetadata.ReleaseDates.Results {
+		//	if r.Iso31661 != ratingSystem {
+		//		continue
+		//	}
+		//	item.Rating = r.ReleaseDates[0].Certification
+		//}
+
 		fmt.Printf("Registering: %s\n", item.TvshowMetadata.Name)
 	default:
 		return
