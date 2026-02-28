@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"opal/internal/config"
 	"opal/internal/httpserver/api"
+	"strings"
 )
 
 func Start() {
@@ -31,11 +32,13 @@ func Start() {
 
 	http.HandleFunc("/users/public", api.EndpointUsersPublic)
 	http.HandleFunc("/Users/authenticatebyname", api.EndpointUsersAuthenticateByName)
+	http.HandleFunc("/Users/AuthenticateByName", api.EndpointUsersAuthenticateByName)
 	http.HandleFunc("/Users/{id}", api.EndpointUsersById)
 	http.HandleFunc("/Users/{id}/Items/Resume", api.EndpointUsersItemsResume)
 	http.HandleFunc("/Users/{id}/Items/Latest", api.EndpointUsersItemsLatest)
 	http.HandleFunc("/Users/{id}/Items/{itemUuid}", api.EndpointUsersItemsByUuid)
 	http.HandleFunc("/Users/{id}/Items", api.EndpointUsersItems)
+	http.HandleFunc("/Users/{id}/Items/{itemUuid}/Intros", api.EndpointUsersItemsUuidIntros)
 
 	http.HandleFunc("/UserViews", api.EndpointUserViews)
 
@@ -64,14 +67,14 @@ func Start() {
 
 func printRequests(mux *http.ServeMux) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, pattern := mux.Handler(r)
+		//_, pattern := mux.Handler(r)
 
-		isUnmapped := pattern == "" || pattern == "/"
-		isNotRoot := r.URL.Path != "/"
+		//isUnmapped := pattern == "" || pattern == "/"
+		//isNotRoot := r.URL.Path != "/"
 
-		if isUnmapped && isNotRoot {
-			//if !strings.HasPrefix(r.URL.Path, "/web") {
-			fmt.Printf("Unmapped request: %s %s %s\n", r.RemoteAddr, r.Method, r.URL.Path)
+		//if isUnmapped && isNotRoot {
+		if !strings.HasPrefix(r.URL.Path, "/web") {
+			fmt.Printf("Request: %s %s %s\n", r.RemoteAddr, r.Method, r.URL.Path)
 		}
 
 		mux.ServeHTTP(w, r)

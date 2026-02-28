@@ -29,68 +29,6 @@ func EndpointUsersPublic(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func EndpointUsersAuthenticateByName(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var authReq jfstructs.RequestUsersAuthenticateByName
-	err := json.NewDecoder(r.Body).Decode(&authReq)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	var userRecord usermgmt.UserRecord
-
-	//TODO: add lookup map
-	for _, user := range usermgmt.UserDB {
-		if user.Username == authReq.Username {
-			userRecord = user
-		}
-	}
-
-	if userRecord.Username == "" {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-		return
-	}
-
-	var aT usermgmt.AccessToken
-
-	if usermgmt.Authenticate(userRecord, authReq.Pw, &aT) != "SUCCESS" {
-		fmt.Printf("API info: failed to authenticate %s\n", authReq.Username)
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-		return
-	}
-
-	aT.UserId = usermgmt.GetId(authReq.Username)
-	aT.UserName = authReq.Username
-
-	//TODO: replace with rwmutex, also inforce usage for endpoints
-	usermgmt.CurrentTokensMutex.Lock()
-	usermgmt.CurrentTokens = append(usermgmt.CurrentTokens, aT)
-	usermgmt.CurrentTokensMutex.Unlock()
-
-	response := jfstructs.ResponseUsersAuthenticateByName{
-		AccessToken: aT.TokenString,
-		ServerID:    "STUBBED",
-		User: jfstructs.CommonUser{
-			Name:                      authReq.Username,
-			ServerID:                  "STUBBED",
-			ID:                        aT.UserId,
-			PrimaryImageTag:           "STUBBED",
-			HasPassword:               true,
-			HasConfiguredPassword:     true,
-			HasConfiguredEasyPassword: false, //TODO: unsure of what this option does
-			EnableAutoLogin:           true,
-		},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
 func EndpointUsersById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

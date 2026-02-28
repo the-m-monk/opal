@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"opal/internal/librarymgmt"
 	"opal/internal/usermgmt"
-	"path"
+	"path/filepath"
 )
 
 // http://localhost:8096/Videos/84c329ff4d2221404996eb00855760db/stream.mp4
@@ -49,7 +49,12 @@ func EndpointVideosUuidStream(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := path.Join(libraryRecord.Path, item.Path)
+	absPath := filepath.Join(libraryRecord.Path, item.Path)
+	realPath, err := filepath.EvalSymlinks(absPath)
+	if err != nil {
+		http.Error(w, "Invalid path", http.StatusForbidden)
+		return
+	}
 
-	http.ServeFile(w, r, filePath)
+	http.ServeFile(w, r, realPath)
 }
